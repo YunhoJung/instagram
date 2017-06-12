@@ -42,8 +42,13 @@ class Post(models.Model):
         if not self.tags.filter(name=tag_name).exists():
             self.tags.add(tag)
 
+    @property
+    def like_count(self):
+        # 자신이 like하고 있는 user수 리턴
+        return self.like_users.count()
 
-class PostLike(models.Model):
+
+class PostLie(models.Model):
     post = models.ForeignKey(Post)
     user = models.ForeignKey(User)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -98,3 +103,5 @@ class Tag(models.Model):
         # $ pip install Pillow
         # pip할 때는 가상환경 유의 !
         # crtl + shift + F
+
+        # 유저모델을 한번 마이그레이션하면 바꾸기 힘들다 주의할 것(외래키와 다대다 관계를 가지기 때문. 바꾸면 일일이 수동으로 수정해야함)
