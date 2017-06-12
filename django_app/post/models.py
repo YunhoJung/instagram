@@ -21,9 +21,35 @@ class Post(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     like_users = models.ManyToManyField(
         User,
-        related_name='like_posts'
+        related_name='like_posts',
+        through='PostLike'
     )
     tags = models.ManyToManyField('Tag')
+
+    def add_comment(self, user, content):
+        # 자신을 post로 갖고, 전달받은 user를 author로 가지며
+        # content를 content필드내용으로 넣는 Comment 객체 생성.
+        return self.comment_set.create(
+            author=user,
+            content=content
+        )
+
+    def add_tag(self, tag_name):
+        # tags에 tag매개변수로 전달된 값(str)을
+        # name으로 갖는 Tag객체를 (이미 존재하면) 가져오고 없으면 생성하여
+        # 자신의 tag에 추가
+        tag, tag_created = Tag.objects.get_or_create(name=tag_name)
+        if not self.tags.filter(name=tag_name).exists():
+            self.tags.add(tag)
+
+
+class PostLike(models.Model):
+    post = models.ForeignKey(Post)
+    user = models.ForeignKey(User)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    # class Meta:
+    #     db_table = 'post_post_like_users'
 
 
 class Comment(models.Model):
@@ -32,10 +58,17 @@ class Comment(models.Model):
     content = models.TextField()
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
+    like_users = models.ManyToManyField(
+        User,
+        through='CommentLike',
+        related_name='like_comments',
+    )
 
 
-# class PostLike(models.Model):
-#     pass
+class CommentLike(models.Model):
+    comment = models.ForeignKey(Comment)
+    user = models.ForeignKey(User)
+    created_date = models.DateTimeField(auto_now_add=True)
 
 
 class Tag(models.Model):
@@ -57,12 +90,11 @@ class Tag(models.Model):
         # 장고에서 제공하는 User 사용하기
         # from django.contrib.auth.models import User 임포트해서 바로 사용하면 된다.
 
-    # models.ImageField() 사용 할때 : 다음의 패키지를 설치해야 마이그레이션 할 수 있다.
-    # pillow 파이썬에서 이미지처리를 할 때 여러가지 기능을 제공한다. image api
-    # pil(파이썬 이미지 라이브러리)
-    # 설치 방법
-    # $ brew install libtiff libjpeg webp little-cms2
-    # $ pip install Pillow
-    # pip할 때는 가상환경 유의 !
-    # crtl + shift + F
-
+        # models.ImageField() 사용 할때 : 다음의 패키지를 설치해야 마이그레이션 할 수 있다.
+        # pillow 파이썬에서 이미지처리를 할 때 여러가지 기능을 제공한다. image api
+        # pil(파이썬 이미지 라이브러리)
+        # 설치 방법
+        # $ brew install libtiff libjpeg webp little-cms2
+        # $ pip install Pillow
+        # pip할 때는 가상환경 유의 !
+        # crtl + shift + F
