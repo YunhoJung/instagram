@@ -8,13 +8,6 @@
     <title>Document</title>
 </head>
 <body>
-{#<div>{{ posts }}</div>#}
-{% for post in posts %}
-    <div>
-        <span>{{ post.id }}</span>
-        <span>{{ post.photo.url }}</span>
-        <img src="{{ post.photo.url }}" alt="">
-    </div>
-{% endfor %}
+{{ post }}
 </body>
 </html>
