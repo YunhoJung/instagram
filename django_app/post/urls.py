@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from . import views
 
 #url namespace
-app_name = 'post'
+app_name = 'post' # reverse하는 모든 namespace URL에 앱네임을 지정해줘야 한다, 단 render 함수는 제외
 urlpatterns = [
     url(r'^$', views.post_list, name='post_list'),
     # /post/3/$, /post/35/$
