@@ -1,12 +1,8 @@
 {% extends 'common/base.html' %}
 
 {% block content %}
-    {#<div>{{ posts }}</div>#}
+
     {% for post in posts %}
-        <div>
-            <span>{{ post.id }}</span>
-            <span>{{ post.photo.url }}</span>
-            <img src="{{ post.photo.url }}" alt="">
-        </div>
-    {% endfor %}
+{% include 'include/post.html' %}
+{% endfor %}
 {% endblock %}
