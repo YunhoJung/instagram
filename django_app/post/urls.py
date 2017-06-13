@@ -4,8 +4,10 @@ from django.conf.urls.static import static
 
 from . import views
 
+#url namespace
+app_name = 'post'
 urlpatterns = [
-    url(r'^$', views.post_list),
+    url(r'^$', views.post_list, name='post_list'),
     # /post/3/$, /post/35/$
     # 정규표현식에서 매칭된 그룹을 위치인수로 변환하는 방법
     # url(r'(^\d+)/$', views.post_detail),
