@@ -1,7 +1,8 @@
-from django.contrib.auth import authenticate, login as django_login, logout as django_logout
+from django.contrib.auth import authenticate, login as django_login, logout as django_logout, get_user_model
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, redirect
 
+User = get_user_model()
 
 def login(request):
     # member/login.html 생성
@@ -57,18 +58,21 @@ def logout(request):
 
 def signup(request):
     if request.method == "POST":
-        pass
-    else:
-        return render(request, 'member/signup.html')
         username = request.POST['username']
         password1 = request.POST['password1']
         password2 = request.POST['password2']
-        if username is not None:
-            return HttpResponse('이미 존재합니다.')
-        elif password1 !== password2:
-            return HttpResponse('일치하지 않습니다.')
-        else:
-            return redirect(request, 'post:post_list')
+        if User.objects.filter(username=username).exists():
+            return HttpResponse('Username is already exist')
+        elif password1 != password2:
+            return HttpResponse('Password and Password check are not equal')
+        user = User.objects.create_user(
+            username=username,
+            password=password1
+        )
+        django_login(request, user)
+        return redirect('post:post_list')
+    else:
+        return render(request, 'member/signup.html')
 
     # url은 /member/signup/$
     # member/signup.html을 사용
