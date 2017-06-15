@@ -1,0 +1,22 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+    <div>
+        <form action="" method="POST">
+            {% csrf_token %}
+            <div>
+                <label for="id-username"></label>
+                <input id="id-username" type="text" name="username">
+            </div>
+            <div>
+                <label for="id-password1"></label>
+                <input id="id-password1" type="password" name="password1">
+            </div>
+            <div>
+                <label for="id-password check"></label>
+                <input id='id-password check type="password" name="password2">
+            </div>
+            <button type="submit">회원가입</button>
+        </form>
+    </div>
+{% endblock %}
