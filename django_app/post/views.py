@@ -1,8 +1,14 @@
-from django.http import HttpResponse, HttpResponseNotFound
+from django.contrib.auth import get_user_model
+from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
+from django.urls import reverse
 
-from post.models import Post
+# 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
+#   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
+User = get_user_model()
+
+from .models import Post
 
 
 def post_list(request):
@@ -25,11 +31,17 @@ def post_detail(request, post_pk):
     try:
         post = Post.objects.get(pk=post_pk)
     except Post.DoesNotExist as e:
-        # 1. 404 Not found를 띄어준다
+        # 1. 404 Notfound를 띄워준다
         # return HttpResponseNotFound('Post not found, detail: {}'.format(e))
-        # 2. post_list view로 들어간다
-        # redirect
-        return redirect('post:post_list')
+
+        # 2. post_list view로 돌아간다
+        # 2-1. redirect를 사용
+        #   https://docs.djangoproject.com/en/1.11/topics/http/shortcuts/#redirect
+        # return redirect('post:post_list')
+        # 2-2. HttpResponseRedirect
+        #   https://docs.djangoproject.com/en/1.11/ref/request-response/#django.http.HttpResponseRedirect
+        url = reverse('post:post_list')
+        return HttpResponseRedirect(url)
 
     # request에 대해 response를 돌려줄 때는 HttpResponse나 render를 사용가능
     # template을 사용하려면 render 함수를 사용한다
@@ -54,7 +66,31 @@ def post_detail(request, post_pk):
 
 def post_create(request):
     # POST요청을 받아 Post객체를 생성 후 post_list페이지로 redirect
-    pass
+    if request.method == "POST":
+        user = User.objects.first()
+        post = Post.objects.create(
+            author=user,
+            # request.FILES에서 파일을 가져오기
+            # http://docs.djangoproject.com/en/1.11/topics/http/file-uploads/#basic-file-uploads
+            # 가져온 파일을 ImageField에 넣도록 설정
+            # 'file'은 POST요청시 input[type="file"]이 가진 name속성
+            photo=request.FILES['file'],
+        )
+        # POST요청시 name이 'comment'인 input에서 전달된 값을 가져옴
+        # dict.get()
+        comment_string = request.POST.get('comment', '')  # request는 딕셔러니 형태
+        # 빈 문자열 ''이나 None 모두 False로 평가되므로
+        # if not으로 댓글로 쓸 내용 도는 comment키가 전달되지 않았음을 검사 가능
+        if comment_string:
+            # 댓글로 사용할 문자열이 전달된 경우 위에서 생성한 post객체에 연결되는 Comment객체를 생성해준다.
+            post.comment_set.create(
+                author=user,
+                content=comment_string,
+            )
+        return redirect('post:post_detail', post_pk=post.pk)
+    else:
+        # post/post_create.html을 render해서 리턴
+        return render(request, 'post/post_create.html')
 
 
 def post_delete(request):
@@ -75,3 +111,7 @@ def comment_modify(reuest, post_pk):
 
 def comment_delete(request, post_pk, comment_pk):
     pass
+
+
+def post_anyway(request):
+    return redirect('post:post_list')
