@@ -1,39 +1,44 @@
-<article>
-  <header>
-    <div class="post-head-left">
-      <img src="" alt="">
-      <span>{{ post.author }}</span>
-    </div>
-    <div class="post-header-right">
+<article class="post">
+    <header>
+        <div class="post-head-left">
+            <img src="" alt="">
+            <span>{{ post.author }}</span>
+        </div>
+        <div class="post-header-right">
 
+        </div>
+    </header>
+    <div class="post-photo-container">
+        {% if type == 'list' %}<a href="{% url 'post:post_detail' post_pk=post.pk %}">
+        <img src="{{ post.photo.url }}" alt="">
+        </a>
+        {% else %}
+        <img src="{{ post.photo.url }}" alt="">
+        {% endif %}
     </div>
-  </header>
-  <div class="photo-container">
-    <img src="{{ post.photo.url}}" alt="">
-  </div>
-  <div class="post-btn-container">
-    <a href="#">
-      <img src="" alt="">
-    </a>
-    <a href="#">
-      <img src="" alt="">
-    </a>
-  </div>
-  <p>좋아요 {{ post.like_count }}개</p>
-  <div class="post-comment-container">
-<!--{#      post에 연결된 Comment목록을 for문으로 순회하며 아래의 div.post-comment를 반복#}-->
-      {% for comment in post.comment_set.all %}
-    <div class="post-comment">
-      <a href="" class="comment-author">{{ comment.author }}</a>
-      <span class="comment-content">{{ comment.content }}</span>
-      <a href="" class="comment-tag"></a>
+    <div class="post-btn-container">
+        <a href="#">
+            <img src="" alt="">
+        </a>
+        <a href="#">
+            <img src="" alt="">
+        </a>
     </div>
-      {% endfor %}
-  </div>
-  <p class="created">{{ post.created_date }}</p>
-  <form action="">
-    <input type="text" placeholder="댓글달기">
-  </form>
+    <p>좋아요 {{ post.like_count }}개</p>
+    <div class="post-comment-container">
+        <!--{#      post에 연결된 Comment목록을 for문으로 순회하며 아래의 div.post-comment를 반복#}-->
+        {% for comment in post.comment_set.all %}
+            <div class="post-comment">
+                <a href="" class="comment-author">{{ comment.author }}</a>
+                <span class="comment-content">{{ comment.content }}</span>
+                <a href="" class="comment-tag"></a>
+            </div>
+        {% endfor %}
+    </div>
+    <p class="created">{{ post.created_date }}</p>
+    <form action="">
+        <input type="text" placeholder="댓글달기">
+    </form>
 </article>
 
 <!--{#post_create 구현 , post.html에 작성한 comment목록 출#}-->
