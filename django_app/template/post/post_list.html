@@ -4,6 +4,9 @@
     <div>
 
         {% for post in posts %}
+            <div>
+                <a href="{% url 'post:post_create' %}" class="btn">Create Post</a>
+            </div>
             {% include 'include/post.html' with type='list' %}
 
         {% endfor %}

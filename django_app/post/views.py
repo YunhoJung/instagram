@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.template import loader
@@ -6,6 +7,8 @@ from django.urls import reverse
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
+from post.forms.post import PostForm
+
 User = get_user_model()
 
 from .models import Post
@@ -64,33 +67,44 @@ def post_detail(request, post_pk):
     return HttpResponse(rendered_string)
 
 
+@login_required
 def post_create(request):
     # POST요청을 받아 Post객체를 생성 후 post_list페이지로 redirect
     if request.method == "POST":
-        user = User.objects.first()
-        post = Post.objects.create(
-            author=user,
-            # request.FILES에서 파일을 가져오기
-            # http://docs.djangoproject.com/en/1.11/topics/http/file-uploads/#basic-file-uploads
-            # 가져온 파일을 ImageField에 넣도록 설정
-            # 'file'은 POST요청시 input[type="file"]이 가진 name속성
-            photo=request.FILES['file'],
-        )
-        # POST요청시 name이 'comment'인 input에서 전달된 값을 가져옴
-        # dict.get()
-        comment_string = request.POST.get('comment', '')  # request는 딕셔러니 형태
-        # 빈 문자열 ''이나 None 모두 False로 평가되므로
-        # if not으로 댓글로 쓸 내용 도는 comment키가 전달되지 않았음을 검사 가능
-        if comment_string:
-            # 댓글로 사용할 문자열이 전달된 경우 위에서 생성한 post객체에 연결되는 Comment객체를 생성해준다.
-            post.comment_set.create(
-                author=user,
-                content=comment_string,
-            )
-        return redirect('post:post_detail', post_pk=post.pk)
+        # user = User.objects.first()
+        # post = Post.objects.create(
+        #     author=user,
+        #     # request.FILES에서 파일을 가져오기
+        #     # http://docs.djangoproject.com/en/1.11/topics/http/file-uploads/#basic-file-uploads
+        #     # 가져온 파일을 ImageField에 넣도록 설정
+        #     # 'file'은 POST요청시 input[type="file"]이 가진 name속성
+        #     photo=request.FILES['photo'],
+        # )
+        # # POST요청시 name이 'comment'인 input에서 전달된 값을 가져옴
+        # # dict.get()
+        # comment_string = request.POST.get('comment', '')  # request는 딕셔러니 형태
+        # # 빈 문자열 ''이나 None 모두 False로 평가되므로
+        # # if not으로 댓글로 쓸 내용 도는 comment키가 전달되지 않았음을 검사 가능
+        # if comment_string:
+        #     # 댓글로 사용할 문자열이 전달된 경우 위에서 생성한 post객체에 연결되는 Comment객체를 생성해준다.
+        #     post.comment_set.create(
+        #         author=user,
+        #         content=comment_string,
+        #     )
+        form = PostForm(data=request.POST, files=request.FILES)
+        # ModeForm의 save()메서드를 사용해서 Post객체를 가져옴
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        if form.is_valid():
+            return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
-        return render(request, 'post/post_create.html')
+        form = PostForm()
+        context = {
+            'form': form,
+        }
+        return render(request, 'post/post_create.html', context=context)
 
 
 def post_delete(request):
