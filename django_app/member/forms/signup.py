@@ -9,6 +9,9 @@ class SignupForm(forms.Form):
     username = forms.CharField(
         widget=forms.TextInput()
     )
+    nickname = forms.CharField(
+        widget=forms.TextInput()
+    )
 
     password1 = forms.CharField(
         widget=forms.PasswordInput()
@@ -38,13 +41,22 @@ class SignupForm(forms.Form):
             )
         return password2
 
+    def clean_nickname(self):
+        nickname = self.cleaned_data['nickname']
+        if User.objects.filter(nickname=nickname).exists():
+            raise forms.ValidationError(
+                'Nickname already exist'
+            )
+
     def create_user(self):
         # 자신의 cleaned_data를 사용해서 유저를 생성
         username = self.cleaned_data['username']
+        nickname = self.cleaned_data['nickname']
         password = self.cleaned_data['password']
         user = User.objects.create_user(
             username=username,
-            password=password
+            nickname=nickname,
+            password=password,
         )
         return user
 
