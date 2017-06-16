@@ -1,9 +1,13 @@
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 
 
 class User(AbstractUser):
     # 이 User모델을 AUTH_USER_MODEL로 사용하도록 settings.py에 설정
-    pass
+    nickname = models.CharField(max_length=24, null=True, unique=True)
+
+    def __str__(self):
+        return self.nickname
 
 
 # abstract User 사용하기
@@ -18,4 +22,4 @@ class User(AbstractUser):
 
 # create_user라는 메서드를 통해 유저 생성 is_staff is_superuser set_password authenticate() 메서드 == 은 값을 비교 하는 것.
 # is, is not은 객체를 비교하는 것. singleton(None처럼 객체 하나를 설정해놓고 가져다 쓰는 객체)의 경우 is로 비교하는게 빠름.
-# 
+#
