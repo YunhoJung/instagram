@@ -4,7 +4,7 @@
     <div>
         <form action="" method="POST">
             {% csrf_token %}
-            {{ form }}
+            {% include 'include/field_set.html' %}
             <button type="submit">로그인!</button>
         </form>
     </div>

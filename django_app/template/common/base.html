@@ -19,6 +19,8 @@
         <nav>
             <div class="nav-left nav-item">
                 <a href="#">
+{#                <link rel="stylesheet" href="{% url 'post:post_list' %}">#}
+{#               <a href="{% url 'post:post_list' %}"></a>#}
                     <img src="{% static 'images/logo.png' %}" alt="">
                 </a>
             </div>
@@ -45,7 +47,11 @@
                     <span>{{ user }}로 로그인 중</span>
                     <a href="{% url 'member:logout' %}" class="btn">Logout</a>
                 {% else %}
-                    <a href="{% url 'member:login' %}" class="btn">Login</a>
+                    <form action="{% url 'member:login' %}" method="POST" class="form-inline-login">
+                    {% csrf_token %}
+                    {{ login_form }}
+                    <button type="submit">Login</button>
+                    </form>
                 {% endif %}
             </div>
         </nav>

@@ -1,0 +1,30 @@
+<!--
+                 form 자체에 대한 error
+                 (Form의 clean()메서드에서 발생한 ValidationError)
+             -->
+            {% if form.non_field_errors %}
+                <ul class="errors">
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            {% for field in form %}
+                <div class="field-wrapper">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="help">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <ul class="errors">
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    {#                <label for="">Username</label>#}
+                    {#                <input type="text" placeholder="유저명을 입력하세요">#}
+
+                </div>
+            {% endfor %}

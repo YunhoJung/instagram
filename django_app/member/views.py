@@ -89,9 +89,7 @@ def signup(request):
         #     )
         form = SignupForm(data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password1 = form.cleaned_data['password1']
-            password2 = form.cleaned_data['password2']
+            user = form.create_user()
         # if User.objects.filter(username=username).exists():
         #         return HttpResponse('Username is already exist')
         #     elif password1 != password2:
@@ -101,15 +99,15 @@ def signup(request):
         #         password=password1
         #     )
         #
-        # django_login(request, user)
-        return redirect('post:post_list')
+            django_login(request, user)
+            return redirect('post:post_list')
 
     else:
         form = SignupForm()
-        context = {
-            'form': form,
-        }
-        return render(request, 'member/signup.html', context)
+    context = {
+        'form': form,
+    }
+    return render(request, 'member/signup.html', context)
 
 # url은 /member/signup/$
 # member/signup.html을 사용

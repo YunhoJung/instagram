@@ -19,12 +19,34 @@ class SignupForm(forms.Form):
     )
 
     def clean_username(self):
-        username = self.cleaned_data['username']
-        if User.objects.filter(username=username).exist():
+        username = self.cleaned_data.get('username')
+        if username and User.objects.filter(username=username).exists():
             raise forms.ValidationError(
                 'Username already exist'
             )
         return username
 
-        # clean_<fieldname>메서드를 사용해서
-        # username 필드에 대한 유효성 검증을 실행
+    def clean_password2(self):
+        # password1과 비교하여 같은지 검증
+        # password2 필드에 clean_<fieldname>을 재정의한 이유는,
+        # cleaned_data에 password1이 이미 들어와 있어야 하기 때문.
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError(
+                'Password mismatch'
+            )
+        return password2
+
+    def create_user(self):
+        # 자신의 cleaned_data를 사용해서 유저를 생성
+        username = self.cleaned_data['username']
+        password = self.cleaned_data['password']
+        user = User.objects.create_user(
+            username=username,
+            password=password
+        )
+        return user
+
+# clean_<fieldname>메서드를 사용해서
+# username 필드에 대한 유효성 검증을 실행

@@ -3,9 +3,9 @@ from django.contrib.auth import authenticate
 
 
 class LoginForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        kwargs.setdefault('label_suffix', '')
-        super().__init__(*args, **kwargs)  # 원래 이닛 다시 실행. 자신이 원래하던 과정을 거쳐가는데,
+    # def __init__(self, *args, **kwargs):
+    #     kwargs.setdefault('label_suffix', '')
+    #     super().__init__(*args, **kwargs)  # 원래 이닛 다시 실행. 자신이 원래하던 과정을 거쳐가는데,
 
     username = forms.CharField(
         max_length=30,
