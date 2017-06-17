@@ -43,14 +43,16 @@ def login(request):
         if form.is_valid():
             user = form.cleaned_data['user']
             django_login(request, user)
+            # 일반적인 경우에는 post_list로 이동하지만,
+            # GET parameter의 next속성값이 있을 경우 해당 URL로 이동
+            next = request.GET.get('next')
+            if next:
+                return redirect(next)
             return redirect('post:post_list')
 
 
         # user변수가 None이 아닐 경우 (정상적으로 인증되어 User객체를 얻은 경우)
         #
-        else:
-            # 로그인에 실패했음을 알림
-            return HttpResponse('Login credentials invalid')
     # get 요청이 왔을 경우, 단순 로그인 Form 보여주기
     else:
         # 만약 이미 로그인 된 상태일 경우에는
@@ -90,15 +92,15 @@ def signup(request):
         form = SignupForm(data=request.POST)
         if form.is_valid():
             user = form.create_user()
-        # if User.objects.filter(username=username).exists():
-        #         return HttpResponse('Username is already exist')
-        #     elif password1 != password2:
-        #         return HttpResponse('Password and Password check are not equal')
-        #     user = User.objects.create_user(
-        #         username=username,
-        #         password=password1
-        #     )
-        #
+            # if User.objects.filter(username=username).exists():
+            #         return HttpResponse('Username is already exist')
+            #     elif password1 != password2:
+            #         return HttpResponse('Password and Password check are not equal')
+            #     user = User.objects.create_user(
+            #         username=username,
+            #         password=password1
+            #     )
+            #
             django_login(request, user)
             return redirect('post:post_list')
 
