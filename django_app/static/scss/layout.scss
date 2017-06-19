@@ -4,6 +4,7 @@ $screen-tablet: 700px;
 $header-height: 83px;
 header.top-header {
   border-bottom: 1px solid $color-border;
+  background-color: #fff;
 }
 header.top-header > nav:nth-child(1) {
   padding: 0 10px;
@@ -79,6 +80,5 @@ form.form-inline-login {
   }
 }
 .container > .content {
-  padding-left: 10px;
-  padding-right: 10px;
+  padding: 10px;
 }

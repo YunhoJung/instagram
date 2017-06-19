@@ -1,44 +1,51 @@
+{% load static %}
 <article class="post">
-    <header>
-        <div class="post-head-left">
-            <img src="" alt="">
-            <span>{{ post.author }}</span>
-        </div>
-        <div class="post-header-right">
+  <header>
+    <div class="post-header-left">
+      <img src="" alt="">
+      <span class="header-author">{{ post.author }}</span>
+    </div>
+    <div class="post-header-right">
 
-        </div>
-    </header>
-    <div class="post-photo-container">
-        {% if type == 'list' %}<a href="{% url 'post:post_detail' post_pk=post.pk %}">
-        <img src="{{ post.photo.url }}" alt="">
-        </a>
-        {% else %}
-        <img src="{{ post.photo.url }}" alt="">
-        {% endif %}
     </div>
+  </header>
+  <div class="post-photo-container">
+    <!--
+    url태그를 사용해서 post:post_detail view로 이동하는 URL을 reverse
+    이때 post_pk라는 kwargs를 받으므로 post_pk key에 현재 post변수의 pk속성을 할당
+    -->
+    {% if type == 'list' %}
+    <a href="{% url 'post:post_detail' post_pk=post.pk %}">
+      <img src="{{ post.photo.url }}" alt="">
+    </a>
+    {% else %}
+    <img src="{{ post.photo.url }}" alt="">
+    {% endif %}
+  </div>
+  <div class="post-bottom">
     <div class="post-btn-container">
-        <a href="#">
-            <img src="" alt="">
-        </a>
-        <a href="#">
-            <img src="" alt="">
-        </a>
+      <a href="#">
+        <img src="{% static 'images/post_heart.png' %}" alt="">
+      </a>
+      <a href="#">
+        <img src="{% static 'images/post_comment.png' %}" alt="">
+      </a>
     </div>
-    <p>좋아요 {{ post.like_count }}개</p>
+    <p class="comment">좋아요 {{ post.like_count }}개</p>
     <div class="post-comment-container">
-        <!--{#      post에 연결된 Comment목록을 for문으로 순회하며 아래의 div.post-comment를 반복#}-->
-        {% for comment in post.comment_set.all %}
-            <div class="post-comment">
-                <a href="" class="comment-author">{{ comment.author }}</a>
-                <span class="comment-content">{{ comment.content }}</span>
-                <a href="" class="comment-tag"></a>
-            </div>
-        {% endfor %}
+      <!--post에 연결된 Comment목록을 for문으로 순회하며 아래의 div.post-comment를 반복-->
+      {% for comment in post.comment_set.all %}
+      <div class="post-comment">
+        <a href="" class="comment-author">{{ comment.author }}</a>
+        <span class="comment-content">{{ comment.content }}</span>
+        <a href="" class="comment-tag"></a>
+        <!--<p class="comment-created">{{ comment.created_date }}</p>-->
+      </div>
+      {% endfor %}
     </div>
     <p class="created">{{ post.created_date }}</p>
     <form action="">
-        <input type="text" placeholder="댓글달기">
+      <input type="text" placeholder="댓글달기" class="input-comment">
     </form>
+  </div>
 </article>
-
-<!--{#post_create 구현 , post.html에 작성한 comment목록 출#}-->
