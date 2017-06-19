@@ -7,6 +7,7 @@ from django.urls import reverse
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
+from post.custom_decorator import post_owner
 from .forms import PostForm
 
 User = get_user_model()
@@ -116,6 +117,8 @@ def post_create(request):
     return render(request, 'post/post_create.html', context=context)
 
 
+@post_owner
+@login_required
 def post_modify(request, post_pk):
     post = Post.objects.get(pk=post_pk)
 
