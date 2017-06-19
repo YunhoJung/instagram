@@ -22,6 +22,7 @@ class Post(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     my_comment = models.OneToOneField(
         'Comment',
+        blank=True,
         null=True,
         related_name='+',
     )

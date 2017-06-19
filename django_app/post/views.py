@@ -128,7 +128,7 @@ def post_modify(request, post_pk):
     context = {
         'form': form,
     }
-    return render(request, 'post/post_create.html', context=context)
+    return render(request, 'post/post_modify.html', context=context)
 
 
 def post_delete(request):
