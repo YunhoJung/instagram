@@ -116,6 +116,21 @@ def post_create(request):
     return render(request, 'post/post_create.html', context=context)
 
 
+def post_modify(request, post_pk):
+    post = Post.objects.get(pk=post_pk)
+
+    if request.method == "POST":
+        form = PostForm(data=request.POST, files=request.FILES, instance=post)
+        form.save()
+        return redirect('post:post_detail', post_pk=post_pk)
+    else:
+        form = PostForm(instance=post)
+    context = {
+        'form': form,
+    }
+    return render(request, 'post/post_create.html', context=context)
+
+
 def post_delete(request):
     # post_pk에 해당하는 Post에 대한 delete요청만을 받음
     # 처리완료 후에는 post_list페이지로 redirect
@@ -127,8 +142,7 @@ def comment_create(request, post_pk):
     pass
 
 
-def comment_modify(reuest, post_pk):
-    # 수정
+def comment_modify(request, post_pk):
     pass
 
 

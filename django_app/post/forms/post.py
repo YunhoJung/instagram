@@ -10,6 +10,8 @@ class PostForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['photo'].required = True
+        if self.instance.my_comment:
+            self.fields['comment'].initial = self.instance.my_comment.content
 
     comment = forms.CharField(
         required=False,
@@ -39,11 +41,13 @@ class PostForm(forms.ModelForm):
         # 현재 위치에서는 author나 pk에 대한 검증이 끝난 상태)
         comment_string = self.cleaned_data['comment']
         if commit and comment_string:
+            # my_comment가 이미 있는 경우 (update의 경우)
             if instance.my_comment:
                 instance.my_comment.content = comment_string
                 instance.my_comment.save()
+            # my_comment가 없는 경우, Comment객체를 생성해서 my_comment
             else:
-                instance.my_comment = Comment.objects.created(
+                instance.my_comment = Comment.objects.create(
                     post=instance,
                     author=author,
                     content=comment_string,
