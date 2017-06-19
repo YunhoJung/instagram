@@ -1,6 +1,6 @@
 from django import forms
 
-from ..models import Post
+from ..models import Post, Comment
 
 
 class PostForm(forms.ModelForm):
@@ -33,12 +33,33 @@ class PostForm(forms.ModelForm):
         self.instance.author = author
         instance = super().save(**kwargs)
 
+        # commit 인수가 True이며 comment필드가 채워져 있을 경우 Comment 생성 로직을 진행
+        # 해당 comment는 instance의 my_comment필드를 채워준다.
+        # (이 위에서 super().save()를 실행하기 때문에
+        # 현재 위치에서는 author나 pk에 대한 검증이 끝난 상태)
         comment_string = self.cleaned_data['comment']
         if commit and comment_string:
-            instance.comment_set.create(
-                author=instance.author,
-                content=comment_string,
-            )
+            if instance.my_comment:
+                instance.my_comment.content = comment_string
+                instance.my_comment.save()
+            else:
+                instance.my_comment = Comment.objects.created(
+                    post=instance,
+                    author=author,
+                    content=comment_string,
+                )
+            instance.save()
+            # comment, comment_created = Comment.objects.get_or_create(
+            #     post=instance,
+            #     author=author,
+            #     defaults={'content': comment_string}
+            # )
+            # if not comment_created:
+            #     comment_content = comment_string
+            # instance.comment_set.create(
+            #     author=instance.author,
+            #     content=comment_string,
+            # )
         return instance
 
 # context_processors 만든 이유?
