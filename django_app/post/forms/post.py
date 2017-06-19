@@ -8,7 +8,7 @@ class PostForm(forms.ModelForm):
     # (Form에서 required=False)이지만,
     # Form을 사용할 때는 반드시 photo를 받도록 함
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, *kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['photo'].required = True
 
     comment = forms.CharField(
@@ -23,5 +23,22 @@ class PostForm(forms.ModelForm):
             'comment',
         )
 
-# context_processors 만든 이유?
+    def save(self, **kwargs):
+        # 전달된 키워드 인수 중 'commit'키 값을 가져옴
+        commit = kwargs.get('commit', True)
+        # 전달된 키워드 인수 중 'author'키 값을 가져오고, 기존  kwargs dict에서 제외
+        author = kwargs.pop('author', None)
 
+        # super()의 save()호출
+        self.instance.author = author
+        instance = super().save(**kwargs)
+
+        comment_string = self.cleaned_data['comment']
+        if commit and comment_string:
+            instance.comment_set.create(
+                author=instance.author,
+                content=comment_string,
+            )
+        return instance
+
+# context_processors 만든 이유?

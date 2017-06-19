@@ -11,7 +11,6 @@ from .forms import PostForm
 
 User = get_user_model()
 
-
 from .models import Post
 
 
@@ -95,9 +94,17 @@ def post_create(request):
         form = PostForm(data=request.POST, files=request.FILES)
         # ModeForm의 save()메서드를 사용해서 Post객체를 가져옴
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
+            post = form.save(author=request.user)
+            # post = form.save(commit=False)
+            # post.author = request.user
+            # post.save()
+            #
+            # comment_string = form.cleaned_data['comment']
+            # if comment_string:
+            #     post.comment_set.create(
+            #         author=request.user,
+            #         content=comment_string
+            #     )
 
             return redirect('post:post_detail', post_pk=post.pk)
     else:
