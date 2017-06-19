@@ -22,3 +22,6 @@ class PostForm(forms.ModelForm):
             'photo',
             'comment',
         )
+
+# context_processors 만든 이유?
+

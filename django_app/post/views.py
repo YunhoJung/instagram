@@ -7,9 +7,10 @@ from django.urls import reverse
 
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
-from post.forms.post import PostForm
+from .forms import PostForm
 
 User = get_user_model()
+
 
 from .models import Post
 
@@ -93,18 +94,19 @@ def post_create(request):
         #     )
         form = PostForm(data=request.POST, files=request.FILES)
         # ModeForm의 save()메서드를 사용해서 Post객체를 가져옴
-        post = form.save(commit=False)
-        post.author = request.user
-        post.save()
         if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+
             return redirect('post:post_detail', post_pk=post.pk)
     else:
         # post/post_create.html을 render해서 리턴
         form = PostForm()
-        context = {
-            'form': form,
-        }
-        return render(request, 'post/post_create.html', context=context)
+    context = {
+        'form': form,
+    }
+    return render(request, 'post/post_create.html', context=context)
 
 
 def post_delete(request):

@@ -51,8 +51,8 @@ def login(request):
             return redirect('post:post_list')
 
 
-        # user변수가 None이 아닐 경우 (정상적으로 인증되어 User객체를 얻은 경우)
-        #
+            # user변수가 None이 아닐 경우 (정상적으로 인증되어 User객체를 얻은 경우)
+            #
     # get 요청이 왔을 경우, 단순 로그인 Form 보여주기
     else:
         # 만약 이미 로그인 된 상태일 경우에는
@@ -61,13 +61,13 @@ def login(request):
         if request.user.is_authenticated:
             return redirect('post:post_list')
         form = LoginForm()  # unbound form
-        context = {
-            'form': form,
-        }
-        return render(request, 'member/login.html', context=context)
+    context = {
+        'form': form,
+    }
+    return render(request, 'member/login.html', context=context)
 
 
-        # render, redirect, httpresponse, ??
+    # render, redirect, httpresponse, ??
 
 
 def logout(request):
