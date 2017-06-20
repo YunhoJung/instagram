@@ -78,21 +78,21 @@ class Comment(models.Model):
         # ex) 박보영 #여신 #존예 인스타
         # -> '박보영 <a href='#'>#여신</a> <a href='#'>#존예</a> 인스타
         # 해당내용을 self.html_content에 대입
+        if not self.pk:
+            super().save(*args, **kwargs)
         self.make_html_content_and_add_tags()
         super().save(*args, **kwargs)
 
-    def make_html_content_and_add_tags(self):
+    def make_html_content_and_add_tags(self, update=True):
         p = re.compile(r'(#\w+)')
         tag_name_list = re.findall(p, self.content)
         ori_content = self.content
         for tag_name in tag_name_list:
             tag, _ = Tag.objects.get_or_create(name=tag_name.replace('#', ''))
-            ori_content = ori_content.replace(
-                tag_name,
-                '<a href="#" class="hash-tag">{}</a>'.format(
-                    tag_name
-                )
+            change_tag = '<a href="#" class="hash-tag">{}</a>'.format(
+                tag_name
             )
+            ori_content = re.sub(r'{}(?![<\w])'.format(tag_name), change_tag, ori_content, count=1)
             if not self.tags.filter(pk=tag.pk).exists():
                 self.tags.add(tag)
         self.html_content = ori_content
