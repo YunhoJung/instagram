@@ -1,6 +1,8 @@
-from django.db import models
+import re
+
 # from django.contrib.auth.models import User
 from django.conf import settings
+from django.db import models
 
 '''
     member application생성
@@ -43,7 +45,6 @@ class Post(models.Model):
             content=content
         )
 
-
     @property
     def like_count(self):
         # 자신이 like하고 있는 user수 리턴
@@ -63,6 +64,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post)
     author = models.ForeignKey(settings.AUTH_USER_MODEL)
     content = models.TextField()
+    html_content = models.TextField(blank=True)
     tags = models.ManyToManyField('Tag')
     created_date = models.DateTimeField(auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
@@ -71,6 +73,30 @@ class Comment(models.Model):
         through='CommentLike',
         related_name='like_comments',
     )
+
+    def save(self, *args, **kwargs):
+        # ex) 박보영 #여신 #존예 인스타
+        # -> '박보영 <a href='#'>#여신</a> <a href='#'>#존예</a> 인스타
+        # 해당내용을 self.html_content에 대입
+        self.make_html_content_and_add_tags()
+        super().save(*args, **kwargs)
+
+    def make_html_content_and_add_tags(self):
+        p = re.compile(r'(#\w+)')
+        tag_name_list = re.findall(p, self.content)
+        ori_content = self.content
+        for tag_name in tag_name_list:
+            tag, _ = Tag.objects.get_or_create(name=tag_name.replace('#', ''))
+            ori_content = ori_content.replace(
+                tag_name,
+                '<a href="#" class="hash-tag">{}</a>'.format(
+                    tag_name
+                )
+            )
+            if not self.tags.filter(pk=tag.pk).exists():
+                self.tags.add(tag)
+        self.html_content = ori_content
+        # content에 포함된 Tag목록을 자신의
 
 
 class CommentLike(models.Model):
