@@ -137,20 +137,27 @@ def post_modify(request, post_pk):
 @post_owner
 @login_required
 def post_delete(request, post_pk):
+    post = get_object_or_404(Post, pk=post_pk)
     if request.method == "POST":
-        post = get_object_or_404(Post, pk=post_pk)
         post.delete()
-    return redirect('post:post_list')
-    # post_pk에 해당하는 Post에 대한 delete요청만을 받음
-    # 처리완료 후에는 post_list페이지로 redirect
+        return redirect('post:post_list')
+    else:
+        context = {
+            'post': post,
+        }
+        return render(request, 'post/post_delete.html', context)
+        # post_pk에 해당하는 Post에 대한 delete요청만을 받음
+        # 처리완료 후에는 post_list페이지로 redirect
 
 
 def comment_create(request, post_pk):
     # POST요청을 받아 Commemnt객체를 생성 후 post_detail 페이지로 redirect
+    # if request.method == "POST":
+    #     form =
     pass
 
 
-def comment_modify(request, post_pk):
+def comment_modify(request, post_pk, comment_pk):
     pass
 
 
