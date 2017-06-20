@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.conf.urls import url
-from django.conf.urls.static import static
 
 from . import views
 
@@ -21,6 +19,7 @@ urlpatterns = [
 
     url(r'^(?P<post_pk>\d+)/delete/$', views.post_delete, name='post_delete'),
     url(r'^(?P<post_pk>\d+)/comment/create/$', views.comment_create, name='comment_create'),
+    url(r'^comment/(?P<comment_pk>\d+)/modify/$', views.comment_modify, name='comment_modify'),
 
     # 위쪽의 결과들과 매칭되지 않을 경우
     # url(r'^.*/$', views.post_anyway, name='post_anyway'),

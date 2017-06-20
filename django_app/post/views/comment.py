@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404, render
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
 from django.views.decorators.http import require_POST
@@ -10,7 +10,7 @@ from post.forms.comment import CommentForm
 
 User = get_user_model()
 
-from ..models import Post
+from ..models import Post, Comment
 
 __all__ = (
     'comment_create',
@@ -42,8 +42,16 @@ def comment_create(request, post_pk):
     return redirect('post:post_detail', post_pk=post.pk)
 
 
-def comment_modify(request, post_pk, comment_pk):
-    pass
+def comment_modify(request, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    if request.method == "POST":
+        pass
+    else:
+        form = CommentForm(instance=comment)
+    context = {
+        'form': form,
+    }
+    return render(request, 'post/comment_modify.html', context)
 
 
 def comment_delete(request, post_pk, comment_pk):

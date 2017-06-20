@@ -1,5 +1,8 @@
 <div class="post-comment" {% if style == 'red' %}style="color: red;"{% endif %}>
-   <a href="" class="comment-author">{{ comment.author }}</a>
-   <span class="comment-content">{{ comment.content }}</span>
-   <a href="" class="comment-tag"></a>
- </div>
+    <a href="" class="comment-author">{{ comment.author }}</a>
+    <span class="comment-content">{{ comment.content }}</span>
+    <a href="" class="comment-tag"></a>
+    {% if request.user == comment.author %}
+        <a href="{% url 'post:comment_modify' comment_pk=comment.pk %}" class="btn btn-xs">수정</a>
+    {% endif %}
+</div>
