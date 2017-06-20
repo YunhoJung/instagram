@@ -6,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404, render
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
 from django.views.decorators.http import require_POST
 
+from post.custom_decorator import comment_owner
 from post.forms.comment import CommentForm
 
 User = get_user_model()
@@ -42,10 +43,17 @@ def comment_create(request, post_pk):
     return redirect('post:post_detail', post_pk=post.pk)
 
 
+@comment_owner
+@login_required
 def comment_modify(request, comment_pk):
     comment = get_object_or_404(Comment, pk=comment_pk)
+    next = request.GET.get('next')
     if request.method == "POST":
-        pass
+        form = CommentForm(request.POST, instance=comment)
+        form.save()
+        if next:
+            return redirect(next)
+        return redirect('post:post_detail', post_pk=comment.post.pk)
     else:
         form = CommentForm(instance=comment)
     context = {

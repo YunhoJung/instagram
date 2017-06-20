@@ -4,8 +4,10 @@
 <div class="content">
     <h3>Comment modify</h3>
     <form action="" method="POST">
+        {% csrf_token %}
         {% include 'include/field_set.html' %}
         <button type="submit" class="btn">수정</button>
     </form>
 </div>
 {% endblock %}
+{#action에 아무것도 없으면 현주소에 보냄 나머지는 get parameter#}
