@@ -62,5 +62,11 @@ def comment_modify(request, comment_pk):
     return render(request, 'post/comment_modify.html', context)
 
 
+@comment_owner
+@require_POST
+@login_required
 def comment_delete(request, post_pk, comment_pk):
-    pass
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    post = comment.post
+    comment.delete()
+    return redirect('post:post_detail', post_pk=post.pk)
