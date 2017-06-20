@@ -1,26 +1,38 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
 from django.urls import reverse
 
+from post.custom_decorator import post_owner
+from post.forms.comment import CommentForm
+from ..forms import PostForm
+
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
-from post.custom_decorator import post_owner
-from .forms import PostForm
 
 User = get_user_model()
 
-from .models import Post
+from ..models import Post
+
+__all__ = (
+    'post_list',
+    'post_detail',
+    'post_create',
+    'post_modify',
+    'post_delete',
+)
 
 
 def post_list(request):
     # 모든 Post목록을 'post'라는 key로 context에 담아 return render 처리
     # post/post_list.html을 template으로 사용하도록 한다.
+    # 각 post 하나 당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
     posts = Post.objects.all()
     context = {
         'posts': posts,
+        'comment_form': CommentForm(),
     }
     return render(request, 'post/post_list.html', context)
 
@@ -149,21 +161,6 @@ def post_delete(request, post_pk):
         # post_pk에 해당하는 Post에 대한 delete요청만을 받음
         # 처리완료 후에는 post_list페이지로 redirect
 
-
-def comment_create(request, post_pk):
-    # POST요청을 받아 Commemnt객체를 생성 후 post_detail 페이지로 redirect
-    # if request.method == "POST":
-    #     form =
-    pass
-
-
-def comment_modify(request, post_pk, comment_pk):
-    pass
-
-
-def comment_delete(request, post_pk, comment_pk):
-    pass
-
-
-def post_anyway(request):
-    return redirect('post:post_list')
+#
+# def post_anyway(request):
+#     return redirect('post:post_list')
