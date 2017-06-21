@@ -14,7 +14,7 @@ from ..forms import PostForm
 
 User = get_user_model()
 
-from ..models import Post
+from ..models import Post, Tag
 
 __all__ = (
     'post_list',
@@ -22,6 +22,7 @@ __all__ = (
     'post_create',
     'post_modify',
     'post_delete',
+    'hashtag_post_list',
 )
 
 
@@ -162,6 +163,7 @@ def post_delete(request, post_pk):
         # post_pk에 해당하는 Post에 대한 delete요청만을 받음
         # 처리완료 후에는 post_list페이지로 redirect
 
+
 def hashtag_post_list(request, tag_name):
     # 1. template 생성
     # post/hashtag_post_list.html
@@ -175,7 +177,17 @@ def hashtag_post_list(request, tag_name):
     #
     # 3. urls.py와 이 view를 연결
     #
-    posts = Post.objects.filter()
+    tag = get_object_or_404(Tag, name=tag_name)
+    posts = Post.objects.filter(my_comment__tags=tag)
+    posts_count = posts.count()
+
+    context = {
+        'tag': tag,
+        'posts': posts,
+        'posts_count': posts_count,
+    }
+    return render(request, 'post/hashtag_post_list.html', context)
+
 #
 # def post_anyway(request):
 #     return redirect('post:post_list')

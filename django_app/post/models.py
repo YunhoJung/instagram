@@ -3,6 +3,7 @@ import re
 # from django.contrib.auth.models import User
 from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 '''
     member application생성
@@ -78,10 +79,8 @@ class Comment(models.Model):
         # ex) 박보영 #여신 #존예 인스타
         # -> '박보영 <a href='#'>#여신</a> <a href='#'>#존예</a> 인스타
         # 해당내용을 self.html_content에 대입
-        if not self.pk:
-            super().save(*args, **kwargs)
-        self.make_html_content_and_add_tags()
         super().save(*args, **kwargs)
+        self.make_html_content_and_add_tags()
 
     def make_html_content_and_add_tags(self, update=True):
         p = re.compile(r'(#\w+)')
@@ -89,13 +88,15 @@ class Comment(models.Model):
         ori_content = self.content
         for tag_name in tag_name_list:
             tag, _ = Tag.objects.get_or_create(name=tag_name.replace('#', ''))
-            change_tag = '<a href="#" class="hash-tag">{}</a>'.format(
-                tag_name
+            change_tag = '<a href="{url}" class="hash-tag">{tag_name}</a>'.format(
+                url=reverse('post:hashtag_post_list', kwargs={'tag_name': tag_name.replace('#', '')}),
+                tag_name=tag_name
             )
             ori_content = re.sub(r'{}(?![<\w])'.format(tag_name), change_tag, ori_content, count=1)
             if not self.tags.filter(pk=tag.pk).exists():
                 self.tags.add(tag)
         self.html_content = ori_content
+        super().save(update_fields=['html_content'])
         # content에 포함된 Tag목록을 자신의
 
 
