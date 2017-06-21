@@ -27,16 +27,27 @@ __all__ = (
 )
 
 
+def post_list_origin(request):
+    posts = Post.objects.all()
+    context = {
+        'posts': posts,
+        'comment_form': CommentForm(),
+    }
+    return render(request, 'post/post_list.html', context)
+
+
 def post_list(request):
     # 모든 Post목록을 'post'라는 key로 context에 담아 return render 처리
     # post/post_list.html을 template으로 사용하도록 한다.
     # 각 post 하나 당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
-
-    post_all = Post.objects.all()
-    paginator = Paginator(post_all, 10)
-    page = request.GET.get('page')
+    # 전체 Post목록 QuerySet생성 (아직 평가되지 않음)
+    all_posts = Post.objects.all()
+    # Paginator객체 생성, 한 페이지 당 3개씩
+    paginator = Paginator(all_posts, 3)
+    # GET parameter에서 'page'값을 page_num변수에 할당
+    page_num = request.GET.get('page')  # GET 파라미터에 page에 오는 것 ! (?다음부터)
     try:
-        posts = paginator.page(page)
+        posts = paginator.page(page_num)
 
     except PageNotAnInteger:
         posts = paginator.page(1)

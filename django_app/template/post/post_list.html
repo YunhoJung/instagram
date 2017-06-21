@@ -13,18 +13,43 @@
         {% endfor %}
     </div>
 
-    <div class="pagination">
-    <span class="step-links">
-        {% if posts.has_previous %}
-        <a href="?page={{ posts.previous_page_number }}" class="btn btn-xs">previous</a>
-        {% endif %}
-    <span class="current">
-        page {{ posts.number }} of {{ posts.paginator.num_pages }}.
-    </span>
-    {% if posts.has_next %}
-    <a href="?page={{ posts.next_page_number }}" class="btn btn-xs">next</a>
-    {% endif %}
-    </span>
+    <div class="test">{{ request.GET }}</div>
+    <div class="test">{{ request.GET.lists }}</div>
+    <div class="test">
+    {% for k, v_list in request.GET.lists %}{% for v in v_list %}&{{ k }}={{ v }}{% endfor %}{% endfor %}
     </div>
-    <br>
+
+    {% if posts.has_previous %}
+        <a href="{{ request.path }}?{{ request. }}page=1" class="btn">처음</a>
+    <a href="{{ request.path }}?page={{ posts.previous_page_number }}" class="btn">이전 {{ posts.previous_page_number }}페이지</a>
+    {% endif %}
+
+    <a href="" class="btn">{{ posts.number }}페이지</a>
+
+    {% if posts.has_next %}
+        <a href="{{ request.path }}?page={{ posts.next_page_number }}" class="btn">다음 {{ posts.next_page_number }}페이지</a>
+        <a href="{{ request.path }}?page={{ posts.paginator.num_pages }}" class="btn">끝</a>
+    {% endif %}
+
+
+    
+
+
+
+
+
+    {#    <div class="pagination">#}
+    {#    <span class="step-links">#}
+    {#        {% if posts.has_previous %}#}
+    {#        <a href="?page={{ posts.previous_page_number }}" class="btn btn-xs">previous</a>#}
+    {#        {% endif %}#}
+    {#    <span class="current">#}
+    {#        page {{ posts.number }} of {{ posts.paginator.num_pages }}.#}
+    {#    </span>#}
+    {#    {% if posts.has_next %}#}
+    {#    <a href="?page={{ posts.next_page_number }}" class="btn btn-xs">next</a>#}
+    {#    {% endif %}#}
+    {#    </span>#}
+    {#    </div>#}
+    {#    <br>#}
 {% endblock %}
