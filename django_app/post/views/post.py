@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.template import loader
@@ -30,12 +31,22 @@ def post_list(request):
     # 모든 Post목록을 'post'라는 key로 context에 담아 return render 처리
     # post/post_list.html을 template으로 사용하도록 한다.
     # 각 post 하나 당 CommentForm을 하나씩 가지도록 리스트 컴프리헨션 사용
-    posts = Post.objects.all()
+
+    post_all = Post.objects.all()
+    paginator = Paginator(post_all, 10)
+    page = request.GET.get('page')
+    try:
+        posts = paginator.page(page)
+
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
     context = {
         'posts': posts,
         'comment_form': CommentForm(),
     }
-    return render(request, 'post/post_list.html', context)
+    return render(request, 'post/post_list.html', context=context)
 
 
 def post_detail(request, post_pk):
@@ -180,14 +191,25 @@ def hashtag_post_list(request, tag_name):
     tag = get_object_or_404(Tag, name=tag_name)
     posts = Post.objects.filter(my_comment__tags=tag)
     posts_count = posts.count()
+    paginator = Paginator(posts, 10)
+    page = request.GET.get('page')
+    try:
+        posts_tag = paginator.page(page)
+    except PageNotAnInteger:
+        posts_tag = paginator.page(1)
+    except EmptyPage:
+        posts_tag = paginator.page(paginator.num_pages)
 
     context = {
         'tag': tag,
         'posts': posts,
         'posts_count': posts_count,
+        'posts_tag': posts_tag,
     }
     return render(request, 'post/hashtag_post_list.html', context)
 
 #
 # def post_anyway(request):
 #     return redirect('post:post_list')
+
+# \d+ -> 숫자 한개 이상

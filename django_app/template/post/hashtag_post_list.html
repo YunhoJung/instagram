@@ -13,4 +13,18 @@
         {% endfor %}
     </ul>
 </div>
+    <div class="pagination">
+    <span class="step-links">
+        {% if posts_tag.has_previous %}
+        <a href="?page={{ posts_tag.previous_page_number }}" class="btn btn-xs">previous</a>
+        {% endif %}
+    <span class="current">
+        page {{ posts_tag.number }} of {{ posts_tag.paginator.num_pages }}.
+    </span>
+    {% if posts_tag.has_next %}
+    <a href="?page={{ posts_tag.next_page_number }}" class="btn btn-xs">next</a>
+    {% endif %}
+    </span>
+    </div>
+    <br>
 {% endblock %}
