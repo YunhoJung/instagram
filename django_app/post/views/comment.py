@@ -5,7 +5,7 @@ from django.shortcuts import redirect, get_object_or_404, render
 # 자동으로 Django에서 인증에 사용하는 User모델클래스를 리턴
 #   https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.get_user_model
 from django.views.decorators.http import require_POST
-
+from utils.templatetags.custom_tags import query_string
 from post.custom_decorator import comment_owner
 from post.forms.comment import CommentForm
 

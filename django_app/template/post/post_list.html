@@ -1,4 +1,5 @@
 {% extends 'common/base.html' %}
+{% load custom_tags %}
 
 {% block content %}
 
@@ -6,7 +7,7 @@
         <a href="{% url 'post:post_create' %}" class="btn">Create Post</a>
     </div>
     <div>
-
+<div class="test">{{ request.GET|query_string }}</div>
         {% for post in posts %}
             {% include 'include/post.html' with type='list' %}
 
@@ -14,10 +15,6 @@
     </div>
 
     <div class="test">{{ request.GET }}</div>
-    <div class="test">{{ request.GET.lists }}</div>
-    <div class="test">
-    {% for k, v_list in request.GET.lists %}{% for v in v_list %}&{{ k }}={{ v }}{% endfor %}{% endfor %}
-    </div>
 
     {% if posts.has_previous %}
         <a href="{{ request.path }}?{{ request. }}page=1" class="btn">처음</a>
