@@ -50,10 +50,11 @@ def comment_modify(request, comment_pk):
     next = request.GET.get('next')
     if request.method == "POST":
         form = CommentForm(request.POST, instance=comment)
-        form.save()
-        if next:
-            return redirect(next)
-        return redirect('post:post_detail', post_pk=comment.post.pk)
+        if form.is_valid():
+            form.save()
+            if next:
+                return redirect(next)
+            return redirect('post:post_detail', post_pk=comment.post.pk)
     else:
         form = CommentForm(instance=comment)
     context = {

@@ -4,6 +4,25 @@ from django.db import models
 
 class User(AbstractUser):
     # 이 User모델을 AUTH_USER_MODEL로 사용하도록 settings.py에 설정
+    '''
+    동작
+    follow : 내가 다른 사람을 follow 함
+    unfollow : 내가 다른 사람에게 한 follow를 취소함
+
+    속성
+    followers : 나를 follow하고 있는 사람들
+    follower : 나를 followㅏ고 있는 사람
+    following : 내가 follow하고 있는 사람들
+    friend : 나와 서로 follow하고 있는 관계
+    friedns : 나와 서로 follow하고 있는 모든 관계
+
+    ex) 내가 박보영을 follow하고 고성현과 김수정은 나를 follow한다
+        나의 followers는 고성현 김수정
+        나의 following은 박보영
+        김수정은 나의 follower이다
+        나는 박보영의 follow다.
+
+    '''
     nickname = models.CharField(max_length=24, null=True, unique=True)
 
     def __str__(self):
