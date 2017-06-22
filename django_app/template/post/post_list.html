@@ -17,7 +17,7 @@
     <div class="test">{{ request.GET }}</div>
 
     {% if posts.has_previous %}
-        <a href="{{ request.path }}?{{ request. }}page=1" class="btn">처음</a>
+        <a href="{{ request.path }}?page=1" class="btn">처음</a>
     <a href="{{ request.path }}?page={{ posts.previous_page_number }}" class="btn">이전 {{ posts.previous_page_number }}페이지</a>
     {% endif %}
 

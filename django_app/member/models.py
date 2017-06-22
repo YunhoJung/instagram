@@ -20,25 +20,78 @@ class User(AbstractUser):
         나의 followers는 고성현 김수정
         나의 following은 박보영
         김수정은 나의 follower이다
-        나는 박보영의 follow다.
+        나는 박보영의 follower이다.
+        나와 고성현은 friedn관계이다.
+        나의 friends
 
     '''
     nickname = models.CharField(max_length=24, null=True, unique=True)
+    relations = models.ManyToManyField(
+        'self',
+        through='Relation',
+        symmetrical=False,
+    )
 
     def __str__(self):
         return self.nickname or self.username
 
+    def follow(self, user):
+        if not isinstance(user, User):
+            raise ValueError('"user" argument must <User> class')
+        self.following_relations.get_or_create(
+            to_user=user,
+        )
 
-# abstract User 사용하기
-# ./manage.py startapp member
-# settings.py 설정
-# AUTH_USER_MODEL = member.User
-# from django.conf import settings하고
-# 기존에 User 클래스를 settings.AUTH_USER.MODEL로 대체
-# 이런 식으로 CustomUser를 사용할 수 있다.
-# 만약 중간에 유저모델을 바꾸는 경우라면 데이터베이스를 전부 다 지우고 처음부터 새로 migrations migrate해주면 된다.
+    def unfollow(self, user):
+        Relation.objects.filter(
+            from_user=self,
+            to_user=user,
+        ).delete()
+
+    def is_follow(self, user):
+        pass
+
+    # 해당 user를 내가 follow하고 있는지 bool여부를 반환
+
+    def follow_toggle(self, user):
+        # 이미 follow상태면 unfollow로 아닐경우 follow상태로 만듬
+        relation, relation_created = self.followering_relations.get_or_create(to_user=user)
+        if not relation_created:
+            relation.delete()
+        else:
+            return relation
 
 
-# create_user라는 메서드를 통해 유저 생성 is_staff is_superuser set_password authenticate() 메서드 == 은 값을 비교 하는 것.
-# is, is not은 객체를 비교하는 것. singleton(None처럼 객체 하나를 설정해놓고 가져다 쓰는 객체)의 경우 is로 비교하는게 빠름.
-#
+class Relation(models.Model):
+    from_user = models.ForeignKey(User, related_name='following_relations')
+    to_user = models.ForeignKey(User, related_name='follower_relations')
+    created_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return 'Relation from({}) to ({})'.format(
+            self.from_user,
+            self.to_user,
+        )
+
+    class Meta:
+        unique_together = (
+            ('from_user', 'to_user'),
+        )
+
+
+        # member.admin / 페이지 오류 / migrations
+
+
+        # abstract User 사용하기
+        # ./manage.py startapp member
+        # settings.py 설정
+        # AUTH_USER_MODEL = member.User
+        # from django.conf import settings하고
+        # 기존에 User 클래스를 settings.AUTH_USER.MODEL로 대체
+        # 이런 식으로 CustomUser를 사용할 수 있다.
+        # 만약 중간에 유저모델을 바꾸는 경우라면 데이터베이스를 전부 다 지우고 처음부터 새로 migrations migrate해주면 된다.
+
+
+        # create_user라는 메서드를 통해 유저 생성 is_staff is_superuser set_password authenticate() 메서드 == 은 값을 비교 하는 것.
+        # is, is not은 객체를 비교하는 것. singleton(None처럼 객체 하나를 설정해놓고 가져다 쓰는 객체)의 경우 is로 비교하는게 빠름.
+        #
