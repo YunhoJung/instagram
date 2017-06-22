@@ -49,7 +49,10 @@ class User(AbstractUser):
         ).delete()
 
     def is_follow(self, user):
-        pass
+        return self.following.relations.filter(to_user=user).exists()
+
+    def is_follower(self, user):
+        return self.follower.relations.filter(from_user=user).exists()
 
     # 해당 user를 내가 follow하고 있는지 bool여부를 반환
 
@@ -60,6 +63,16 @@ class User(AbstractUser):
             relation.delete()
         else:
             return relation
+
+    @property
+    def following(self):
+        relations = self.following_relations.all()
+        return User.objects.filter(pk_in=relations.values('pk'))
+
+    @property
+    def followers(self):
+        relations = self.follower_relations.all()
+        return User.objects.filter(pk_in=relations.values('pk'))
 
 
 class Relation(models.Model):
