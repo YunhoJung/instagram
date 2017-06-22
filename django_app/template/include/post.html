@@ -72,8 +72,7 @@
             {% endfor %}
         </div>
         <p class="created">{{ post.created_date }}</p>
-        <form action="{% url 'post:comment_create' post_pk=post.pk %}?next=
-                {{ request.path }}{{ request.GET|query_string }}#post-{{ post.pk }}" method="post">
+        <form action="{% url 'post:comment_create' post_pk=post.pk %}?next={{ request.path }}{{ request.GET|query_string }}#post-{{ post.pk }}" method="post">
             {% csrf_token %}
             {{ comment_form.content }}
         </form>
