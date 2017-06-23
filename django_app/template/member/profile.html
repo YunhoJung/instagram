@@ -2,47 +2,56 @@
 
 
 {% block content %}
-<div class="content">
-	<h3>{{ cur_user }}</h3>
+    <div class="content">
+        <h3>{{ cur_user }}</h3>
 
-	{% if user != cur_user %}
-		{% if cur_user in user.following %}
-		<button type="submit" class="btn">팔로우 취소</button>
-		{% else %}
-		<button type="submit" class="btn">팔로우</button>
-		{% endif %}
-	{% endif %}
+        {% if user != cur_user %}
+            <form action="{% url 'member:follow_toggle' user_pk=cur_user.pk %}" method="post">
+                {% csrf_token %}
+                {% if cur_user in user.following %}
+                    <button type="submit" class="btn">팔로우 취소</button>
+                {% else %}
+                    <button type="submit" class="btn">팔로우</button>
+                {% endif %}
+            </form>
+        {% endif %}
 
 
-	<h5>Following</h5>
-	{% for u in cur_user.following %}
-		<div>
-			<!--해당 User의 Profile페이지로 갈 수 있는 링크 생성-->
-			<a href="{% url 'member:profile' user_pk=u.pk %}" class="btn">{{ u }}</a>
-		</div>
-	{% endfor %}
+        <h5>Following</h5>
+        {% for u in cur_user.following %}
+            <div>
+                <!--해당 User의 Profile페이지로 갈 수 있는 링크 생성-->
+                <a href="{% url 'member:profile' user_pk=u.pk %}" class="btn">{{ u }}</a>
+            </div>
+        {% endfor %}
 
-	<h5>Followers</h5>
-	{% for u in cur_user.followers %}
-		<div>
-			<!--해당 User의 Profile페이지로 갈 수 있는 링크 생성-->
-			<a href="{% url 'member:profile' user_pk=u.pk %}" class="btn">{{ u }}</a>
-		</div>
-	{% endfor %}
+        <h5>Followers</h5>
+        {% for u in cur_user.followers %}
+            <div>
+                <!--해당 User의 Profile페이지로 갈 수 있는 링크 생성-->
+                <a href="{% url 'member:profile' user_pk=u.pk %}" class="btn">{{ u }}</a>
+            </div>
+        {% endfor %}
 
-<ul class="profile-photo-list">
-    {% for post in posts %}
-    <li>
-        <img src="{{ post.photo.url }}" alt="">
-    </li>
-    {% endfor %}
-</ul>
-{% if request.GET.page %}
-    <a href="?page={{ request.GET.page|add:1 }}" class="btn btn-primary btn-block">더 불러오기</a>
-    {% else %}
-    <a href="?page=2" class="btn">더 불러오기</a>
-{% endif %}
-</div>
+        <ul class="profile-photo-list">
+            {% for post in posts %}
+                <li>
+                    <a href="{% url 'post:post_detail' post_pk=post.pk %}">
+                        <img src="{{ post.photo.url }}" alt="">
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% if next_page %}
+            <a href="?page={{ next_page }}" class="btn btn-lg btn-primary">더 불러오기</a>
+        {% endif %}
+{#        {% if request.GET.page %}#}
+{#            <a href="?page={{ page|add:1 }}" class="btn btn-primary btn-block">더 불러오기</a>#}
+{#        {% else %}#}
+{#            <a href="?page=2" class="btn">더 불러오기</a>#}
+{#        {% endif %}#}
+    </div>
 {% endblock %}
 {##}
 {#    {{ cur_user.following_relations.all }}#}

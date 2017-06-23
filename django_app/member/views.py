@@ -1,8 +1,8 @@
-from django.contrib.auth import authenticate, login as django_login, logout as django_logout, get_user_model
-from django.http import HttpResponseRedirect, HttpResponse
+from django.contrib.auth import login as django_login, logout as django_logout, get_user_model
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.http import require_POST
 
-from post.models import Post
 from .forms import LoginForm, SignupForm
 
 User = get_user_model()
@@ -115,6 +115,7 @@ def signup(request):
 
 
 def profile(request, user_pk=None):
+    num_posts_per_page = 6
     # 0. urls.py와 연결
     # 1. user_pk에 해당하는 User를 cur_user키로 render
     # 2. member/profile.html작성, 해당 user정보 보여주기
@@ -137,12 +138,32 @@ def profile(request, user_pk=None):
         user = get_object_or_404(User, pk=user_pk)
     else:
         user = request.user
-    posts = Post.objects.filter(author=user).order_by('created_date')[:page * 9]
+    posts = user.post_set.order_by('-created_date')[:page * num_posts_per_page]
+    post_count = user.post_set.count()
+    next_page = page + 1 if post_count > page * num_posts_per_page else None
     context = {
         'cur_user': user,
-        'posts': posts
+        'posts': posts,
+        'post_count': post_count,
+        'page': page,
+        'next_page': next_page,
     }
     return render(request, 'member/profile.html', context)
+
+
+@require_POST
+@login_required
+def follow_toggle(request, user_pk):
+    # 'next' GET parameter 값을 가져옴
+    next = request.GET.get('next')
+    # follow를 toggle할 대상유저
+    target_user = get_object_or_404(User, pk=user_pk)
+    # 요청 유저 (로그안한 유저)의 follow_toggle()메서드 실행
+    request.user.follow_toggle(target_user)
+    # next가 있으면 해당 위치로 아닐 경우 target_user의 profile페이지로 이동
+    if next:
+        return redirect(next)
+    return redirect('member:profile', user_pk=user_pk)
 
 # url은 /member/signup/$
 # member/signup.html을 사용
