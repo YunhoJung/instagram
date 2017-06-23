@@ -4,9 +4,9 @@
 {% block content %}
     <div class="content profile">
         <h3>{{ cur_user }}</h3>
-    {% if cur_user.img_profile %}
+{#    {% if cur_user.img_profile %}#}
         <img src="{{ cur_user.img_profile.url }}" alt="" width="150">
-    {% endif %}
+{#    {% endif %}#}
 {% if user.is_authenticated %}
         {% if user != cur_user %}
             <form action="{% url 'member:follow_toggle' user_pk=cur_user.pk %}" method="post">
