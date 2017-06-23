@@ -2,9 +2,12 @@
 
 
 {% block content %}
-    <div class="content">
+    <div class="content profile">
         <h3>{{ cur_user }}</h3>
-
+    {% if cur_user.img_profile %}
+        <img src="{{ cur_user.img_profile.url }}" alt="" width="150">
+    {% endif %}
+{% if user.is_authenticated %}
         {% if user != cur_user %}
             <form action="{% url 'member:follow_toggle' user_pk=cur_user.pk %}" method="post">
                 {% csrf_token %}
@@ -14,7 +17,10 @@
                     <button type="submit" class="btn">팔로우</button>
                 {% endif %}
             </form>
+        {% else %}
+            <a href="{% url 'member:profile_edit' %}">프로필 수정</a>
         {% endif %}
+    {% endif %}
 
 
         <h5>Following</h5>

@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^logout/$', views.logout, name='logout'),
     url(r'^signup/$', views.signup, name='signup'),
     url(r'^profile/$', views.profile, name='my_profile'),
+    url(r'^profile/edit/$', views.profile_edit, name='profile_edit'),
     url(r'^profile/(?P<user_pk>\d+)/$', views.profile, name='profile'),
     url(r'^follow-toggle/(?P<user_pk>\d+)/$', views.follow_toggle, name='follow_toggle')
 ]

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 
+from member.forms import UserEditForm
 from .forms import LoginForm, SignupForm
 
 User = get_user_model()
@@ -164,6 +165,29 @@ def follow_toggle(request, user_pk):
     if next:
         return redirect(next)
     return redirect('member:profile', user_pk=user_pk)
+
+
+@login_required
+def profile_edit(request):
+    if request.method == "POST":
+        # UserEditForm에 수정할 data를 함께 binding
+        form = UserEditForm(
+            data=request.POST,
+            files=request.FILES,
+            instance=request.user,
+        )
+        # data가 올바를 경우 (유효성 통과)
+        if form.is_valid():
+            # form.save()를 이용해 instance를 update
+            form.save()
+            return redirect('member:my_profile')
+    else:
+        form = UserEditForm(instance=request.user)
+    context = {
+        'form': form,
+    }
+    return render(request, 'member/profile_edit.html', context)
+
 
 # url은 /member/signup/$
 # member/signup.html을 사용

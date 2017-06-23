@@ -26,6 +26,7 @@ class User(AbstractUser):
 
     '''
     nickname = models.CharField(max_length=24, null=True, unique=True)
+    img_profile = models.ImageField(upload_to='member-%y%m%d', blank=True)
     relations = models.ManyToManyField(
         'self',
         through='Relation',
