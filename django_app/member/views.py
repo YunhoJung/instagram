@@ -1,6 +1,8 @@
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout, get_user_model
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
+
+from post.models import Post
 from .forms import LoginForm, SignupForm
 
 User = get_user_model()
@@ -110,6 +112,37 @@ def signup(request):
         'form': form,
     }
     return render(request, 'member/signup.html', context)
+
+
+def profile(request, user_pk=None):
+    # 0. urls.py와 연결
+    # 1. user_pk에 해당하는 User를 cur_user키로 render
+    # 2. member/profile.html작성, 해당 user정보 보여주기
+    #   2-1. 해당 user의 followers, following목록 보여주기
+    # 3. 현재 로그인한 유저가 해당 유저(cur_user)를 팔로우하고 있는지 여부 보여주기
+    #   3-1. 팔로우하고 있다면 '팔로우 해제'버튼 아니라면 '팔로우'버튼 띄워주기.
+    # 4~ -> def follow_toggle(request)뷰 생성
+
+    # GET parameter에 들어온 'page'값 처리
+    page = request.GET.get('page', 1)
+    try:
+        page = int(page) if int(page) > 1 else 1
+    except ValueError:
+        page = 1
+    except Exception as e:
+        page = 1
+        print(e)
+
+    if user_pk:
+        user = get_object_or_404(User, pk=user_pk)
+    else:
+        user = request.user
+    posts = Post.objects.filter(author=user).order_by('created_date')[:page * 9]
+    context = {
+        'cur_user': user,
+        'posts': posts
+    }
+    return render(request, 'member/profile.html', context)
 
 # url은 /member/signup/$
 # member/signup.html을 사용
