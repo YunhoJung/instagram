@@ -203,20 +203,24 @@ def facebook_login(request):
                 'name',
                 'first_name',
                 'last_name',
-                'picture',
+                'picture.type(large)',
                 'gender',
             ])
         }
         response = requests.get(url_user_info, params=url_user_info_params)
         result = response.json()
-        print(result)
+        return result
 
     if not code:
         return add_message_and_redirect_referer()
     try:
         access_token = get_access_token(code)
         debug_result = debug_token(access_token)
-        get_user_info(user_id=debug_result['data']['user_id'], token=access_token)
+        user_info = get_user_info(user_id=debug_result['data']['user_id'], token=access_token)
+        user = User.objects.get_or_create_facebook_user(user_info)
+
+        django_login(request, user)
+        return redirect(request.META['HTTP_REFERER'])
     except GetAccessTokenException as e:
         print(e.code)
         print(e.message)
