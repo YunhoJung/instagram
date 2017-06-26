@@ -1,7 +1,6 @@
-from pprint import pprint
-
 import requests
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login as django_login, logout as django_logout, get_user_model
 from django.shortcuts import render, redirect
 
@@ -124,24 +123,54 @@ def signup(request):
 
 
 def facebook_login(request):
-    redirect_uri = '{}://{}{}'.format(
-        request.scheme,
-        request.META['HTTP_HOST'],
-        request.path,
-    )
-    # facebook_login view가 처음 호출될 때 'code' reqeust GET parameter
-    url_access_token = 'https://graph.facebook.com/v2.9/oauth/access_token?client_id={app-id}' \
-                       '&redirect_uri={redirect-uri}' \
-                       '&client_secret={app-secret}' \
-                       '&code={code-parameter}'
     code = request.GET.get('code')
-    if code:
+    app_access_token = '{}|{}'.format(
+        settings.FACEBOOK_APP_ID,
+        settings.FACEBOOK_SECRET_CODE,
+    )
+
+    def add_message_and_redirect_referer():
+        error_message_for_user = 'Facebook login error'
+        messages.error(request, error_message_for_user)
+        return redirect(request.META['HTTP_REFERER'])
+
+    def get_access_token(code):
+        url_access_token = 'https://graph.facebook.com/v2.9/oauth/access_token'
+        redirect_uri = '{}://{}{}'.format(
+            request.scheme,
+            request.META['HTTP_HOST'],
+            request.path,
+        )
+        # facebook_login view가 처음 호출될 때 'code' reqeust GET parameter
+
         url_access_token_params = {
             'client_id': settings.FACEBOOK_APP_ID,
             'redirect_uri': redirect_uri,
-            'app_secret': settings.FACEBOOK_SECRET_CODE,
+            'client_secret': settings.FACEBOOK_SECRET_CODE,
             'code': code,
         }
+        print(url_access_token_params)
         response = requests.get(url_access_token, params=url_access_token_params)
         result = response.json()
-        pprint(result)
+        if 'access_token' in result:
+            return result['access_token']
+        elif 'error' in result:
+            raise Exception(result['error'])
+            # error_message = 'Facebook login error\n type: {}\n message: {}'.format(
+            #     result['error']['type'],
+            #     result['error']['message'],
+            #
+            # )
+            # print(error_message)
+            # messages.error(request, error_message)
+            # return redirect(request.META['HTTP_REFERER'])
+        else:
+            raise Exception('Unknown error')
+
+    if not code:
+        return add_message_and_redirect_referer()
+    try:
+        access_token = get_access_token(code)
+    except Exception as e:
+        print(e)
+        return add_message_and_redirect_referer()
