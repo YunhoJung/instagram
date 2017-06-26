@@ -129,6 +129,20 @@ def facebook_login(request):
         settings.FACEBOOK_SECRET_CODE,
     )
 
+    class GetAccessTokenException(Exception):
+        def __init__(self, *args, **kwargs):
+            error_dict = args[0]['data']['error']
+            self.code = error_dict['code']
+            self.message = error_dict['message']
+            self.is_valid = error_dict['is_valid']
+            self.scopes = error_dict['scopes']
+
+    class DebugTokenException(Exception):
+        def __init__(self, *args, **kwargs):
+            error_dict = args[0]['data']['error']
+            self.code = error_dict['code']
+            self.message = error_dict['message']
+
     def add_message_and_redirect_referer():
         error_message_for_user = 'Facebook login error'
         messages.error(request, error_message_for_user)
@@ -155,7 +169,7 @@ def facebook_login(request):
         if 'access_token' in result:
             return result['access_token']
         elif 'error' in result:
-            raise Exception(result['error'])
+            raise GetAccessTokenException(result)
             # error_message = 'Facebook login error\n type: {}\n message: {}'.format(
             #     result['error']['type'],
             #     result['error']['message'],
@@ -167,10 +181,47 @@ def facebook_login(request):
         else:
             raise Exception('Unknown error')
 
+    def debug_token(token):
+        url_debug_token = 'https://graph.facebook.com/debug_token'
+        url_debug_token_params = {
+            'input_token': token,
+            'access_token': app_access_token,
+        }
+        response = requests.get(url_debug_token, url_debug_token_params)
+        result = response.json()
+        if 'error' in result['data']:
+            raise DebugTokenException(result['data']['error'])
+        else:
+            return result
+
+    def get_user_info(user_id, token):
+        url_user_info = 'https://graph.facebook.com/v2.9/{user_id}'.format(user_id=user_id)
+        url_user_info_params = {
+            'access_token': token,
+            'fields': ','.join([
+                'id',
+                'name',
+                'first_name',
+                'last_name',
+                'picture',
+                'gender',
+            ])
+        }
+        response = requests.get(url_user_info, params=url_user_info_params)
+        result = response.json()
+        print(result)
+
     if not code:
         return add_message_and_redirect_referer()
     try:
         access_token = get_access_token(code)
-    except Exception as e:
-        print(e)
+        debug_result = debug_token(access_token)
+        get_user_info(user_id=debug_result['data']['user_id'], token=access_token)
+    except GetAccessTokenException as e:
+        print(e.code)
+        print(e.message)
+        return add_message_and_redirect_referer()
+    except DebugTokenException as e:
+        print(e.code)
+        print(e.message)
         return add_message_and_redirect_referer()
