@@ -26,7 +26,8 @@ urlpatterns = [
 
     url(r'^tag/(?P<tag_name>\w+)/$', views.hashtag_post_list, name='hashtag_post_list'),
 
-    url(r'^youtube/search/$', views.youtube_search, name='youtube_search'),
+    url(r'^youtube/search/$', views.youtube_create, name='youtube_create'),
+    # url(r'^youtube/create/$', views.youtube_create, name='youtube_create'),
 ]
 
 # 위쪽의 결과들과 매칭되지 않을 경우

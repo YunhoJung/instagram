@@ -135,3 +135,17 @@ class Tag(models.Model):
         # crtl + shift + F
 
         # 유저모델을 한번 마이그레이션하면 바꾸기 힘들다 주의할 것(외래키와 다대다 관계를 가지기 때문. 바꾸면 일일이 수동으로 수정해야함)
+# 모델은 데이터베이스에 관여하기 때문에 사용. 형식 틀같은 느낌임
+# url : 연결
+# view : 행동을 기술하는 것
+class Video(models.Model):
+    # 비디오아이디, 타이틀, 디스크립션, 썸네일, - 하이, 만든날짜
+    video_id = models.CharField(max_length=100, blank=True, null=True, unique=True)
+    title = models.CharField(max_length=100, blank=True, null=True)
+    video_description = models.TextField()
+    thumbnail = models.ImageField(upload_to='youtude-%y%m%d', blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+
+
+
+
