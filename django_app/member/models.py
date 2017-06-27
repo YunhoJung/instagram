@@ -36,7 +36,7 @@ class UserManager(DefaultUserManager):
                 user.pk,
                 file_ext,
             )
-            temp_file = NamedTemporaryFile(delete=False)
+            temp_file = NamedTemporaryFile()
             response = requests.get(url_picture)
             temp_file.write(response.content)
             user.img_profile.save(file_name, File(temp_file))
